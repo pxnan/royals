@@ -62,9 +62,9 @@ const SidebarAdmin = () => {
                     {/* Kelola Dataset */}
                     <li>
                         <Link 
-                            to={"/admin/input-pertanyaan?tab=dataset"} 
+                            to={"/admin/kelola-data?tab=dataset"} 
                             onClick={closeDrawer}
-                            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${getLinkClass('/admin/input-pertanyaan', 'dataset')}`}
+                            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${getLinkClass('/admin/kelola-data', 'dataset')}`}
                             data-tip="Kelola Dataset"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4">
@@ -77,9 +77,9 @@ const SidebarAdmin = () => {
                     {/* Pertanyaan Tidak Dikenali */}
                     <li>
                         <Link 
-                            to={"/admin/input-pertanyaan?tab=unknown"} 
+                            to={"/admin/kelola-data?tab=unknown"} 
                             onClick={closeDrawer}
-                            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${getLinkClass('/admin/input-pertanyaan', 'unknown')}`}
+                            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${getLinkClass('/admin/kelola-data', 'unknown')}`}
                             data-tip="Pertanyaan Tidak Dikenali"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4">
@@ -92,9 +92,9 @@ const SidebarAdmin = () => {
                     {/* Tambah Pertanyaan Baru */}
                     <li>
                         <Link 
-                            to={"/admin/input-pertanyaan?tab=add"} 
+                            to={"/admin/kelola-data?tab=add"} 
                             onClick={closeDrawer}
-                            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${getLinkClass('/admin/input-pertanyaan', 'add')}`}
+                            className={`is-drawer-close:tooltip is-drawer-close:tooltip-right ${getLinkClass('/admin/kelola-data', 'add')}`}
                             data-tip="Tambah Pertanyaan"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4">

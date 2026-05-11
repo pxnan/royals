@@ -4,7 +4,7 @@ import UserPage from '../pages/user/UserPage';
 import AdminPage from '../pages/admin/AdminPage';
 import NotFoundPage from '../pages/notFound/NotFoundPage';
 import AdminLatihModel from '../pages/admin/AdminLatihModel';
-import InputPertanyaan from '../pages/admin/InputPertanyaan';
+import KelolaData from '../pages/admin/KelolaData';
 import KelolaAdmin from '../pages/admin/KelolaAdmin';
 import Login from '../pages/admin/Login';
 
@@ -74,10 +74,10 @@ const AppRoutes = () => (
             />
             
             <Route 
-                path="/admin/input-pertanyaan" 
+                path="/admin/kelola-data" 
                 element={
                     <ProtectedAdminRoute>
-                        <InputPertanyaan />
+                        <KelolaData />
                     </ProtectedAdminRoute>
                 } 
             />

@@ -6,7 +6,7 @@ import ManageUnknownQuestions from '../../components/ManageUnknownQuestions';
 import TambahPertanyaan from '../../components/TambahPertanyaan';
 import NavbarAdmin from '../../components/NavbarAdmin';
 
-const InputPertanyaan = () => {
+const KelolaData = () => {
     const navigate = useNavigate();
     const location = useLocation();
     
@@ -72,11 +72,6 @@ const InputPertanyaan = () => {
                                     >
                                         ➕ Tambah Pertanyaan Baru
                                     </button>
-                                </div>
-
-                                {/* Info URL saat ini (optional) */}
-                                <div className="text-center text-xs text-gray-400 mb-4">
-                                    URL: /admin/input-pertanyaan?tab={activeTab}
                                 </div>
 
                                 {/* Konten berdasarkan tab yang dipilih */}
