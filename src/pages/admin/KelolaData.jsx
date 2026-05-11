@@ -131,4 +131,4 @@ const KelolaData = () => {
     );
 }
 
-export default InputPertanyaan;
+export default KelolaData;
