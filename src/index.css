@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui" {
+    themes: light --default;
+    --color-primary: var(--color-amber-600);
+    --color-primary-content: white;
+    --color-secondary: var(--color-amber-500);
+    --color-secondary-content: white;
+    --color-accent: var(--color-amber-400);
+    --color-accent-content: white;
+    --color-info: var(--color-amber-600);
+    --color-info-content: white;
+}
