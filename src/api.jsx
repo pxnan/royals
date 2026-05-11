@@ -68,6 +68,22 @@ export async function sendQuestion(question) {
     return await response.json();
 }
 
+export async function sendAmbiguousUnknown(question) {
+    console.log("Mengirim pertanyaan ke server:", question); // Debugging
+    
+    const response = await fetch(`${API_BASE_URL}/chat/ambiguous-unknown`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({ original_question: question }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Gagal menghubungi server");
+    }
+
+    return await response.json();
+}
+
 export async function getRecommendations() {
     const response = await fetch(`${API_BASE_URL}/api/recommendations`, {
         method: "GET",
@@ -460,6 +476,7 @@ export async function resetDatabase(token) {
 // ==================== EXPORT DEFAULT ====================
 export default {
     sendQuestion,
+    sendAmbiguousUnknown,
     login,
     logout,
     verifyToken,

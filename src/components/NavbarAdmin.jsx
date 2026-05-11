@@ -110,8 +110,8 @@ const NavbarAdmin = ({ title }) => {
                 </button>
             )}
 
-            {/* Style tambahan untuk animasi */}
-            <style jsx>{`
+            {/* Style tambahan untuk animasi - HAPUS 'jsx' */}
+            <style>{`
                 @keyframes bounce {
                     0%, 100% {
                         transform: translateY(0);

@@ -56,7 +56,7 @@ const Login = () => {
                 <div className="w-full max-w-md">
                     <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
                         <div className="pt-8 px-6 text-center">
-                            <div className="w-20 h-20 bg-amber-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
+                            <div className="w-20 h-20 bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                 </svg>
@@ -89,7 +89,7 @@ const Login = () => {
                                             name="username"
                                             value={formData.username}
                                             onChange={handleChange}
-                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition bg-gray-50"
+                                            className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition bg-gray-50"
                                             placeholder="Masukkan username"
                                             disabled={loading}
                                             autoComplete="username"
@@ -110,7 +110,7 @@ const Login = () => {
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
-                                            className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition bg-gray-50"
+                                            className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition bg-gray-50"
                                             placeholder="Masukkan password"
                                             disabled={loading}
                                             autoComplete="current-password"
@@ -137,7 +137,7 @@ const Login = () => {
                                 <button
                                     type="submit"
                                     disabled={loading}
-                                    className="w-full bg-amber-600 text-white py-2.5 px-4 cursor-pointer rounded-xl font-semibold hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                                    className="w-full bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-600 text-white py-2.5 px-4 cursor-pointer rounded-xl font-semibold hover:to-yellow-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                                 >
                                     {loading ? (
                                         <span className="flex items-center justify-center gap-2">

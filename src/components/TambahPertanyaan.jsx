@@ -26,7 +26,6 @@ const TambahPertanyaan = ({ onSuccess, onCancel }) => {
             const data = await getKategori();
             if (data.kategori) {
                 setKategoriList(data.kategori);
-                console.log('Kategori loaded:', data.kategori);
             } else {
                 console.warn('No categories received from API');
             }

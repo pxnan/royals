@@ -6,7 +6,6 @@ const Navbar = ({ onClearHistory, hasMessages }) => {
 
     const handleClearClick = () => {
         setShowConfirm(true);
-        // Auto hide after 3 seconds (optional)
         setTimeout(() => {
             setShowConfirm(false);
         }, 3000);
@@ -28,14 +27,13 @@ const Navbar = ({ onClearHistory, hasMessages }) => {
             <div className="navbar bg-white shadow-lg sticky top-0 z-50 border-b border-gray-300">
                 <div className="flex w-full justify-between px-5 items-center">
                     <Link to={"/"} className="text-xl font-semibold">
-                        Royal's Resto <span className='text-amber-600 font-bold'>Bot</span>
+                        Royal's Resto <span className='bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-600 bg-clip-text text-transparent font-bold'>Bot</span>
                     </Link>
                     
-                    {/* Tombol Hapus Histori - hanya tampil jika ada pesan */}
                     {hasMessages && (
                         <button
                             onClick={handleClearClick}
-                            className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
+                            className="flex items-center cursor-pointer gap-1 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors duration-200"
                             title="Hapus semua histori chat"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -47,7 +45,6 @@ const Navbar = ({ onClearHistory, hasMessages }) => {
                 </div>
             </div>
 
-            {/* Popup Konfirmasi dari atas (slide down) */}
             {showConfirm && (
                 <div className="fixed top-16 left-0 right-0 z-50 flex justify-center pointer-events-none">
                     <div className="bg-white rounded-lg shadow-xl border border-gray-200 w-full max-w-sm mx-4 pointer-events-auto animate-slideDown">
@@ -68,13 +65,13 @@ const Navbar = ({ onClearHistory, hasMessages }) => {
                                     <div className="flex gap-2 mt-3">
                                         <button
                                             onClick={confirmClear}
-                                            className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
+                                            className="px-3 py-1.5 text-sm cursor-pointer bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200"
                                         >
                                             Ya, Hapus
                                         </button>
                                         <button
                                             onClick={cancelClear}
-                                            className="px-3 py-1.5 text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200"
+                                            className="px-3 py-1.5 text-sm cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg transition-colors duration-200"
                                         >
                                             Batal
                                         </button>
@@ -86,7 +83,8 @@ const Navbar = ({ onClearHistory, hasMessages }) => {
                 </div>
             )}
 
-            <style jsx>{`
+            {/* Ganti <style jsx> dengan <style> biasa */}
+            <style>{`
                 @keyframes slideDown {
                     from {
                         opacity: 0;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ChatWindow from "../../components/ChatWindow";
 import ChatInput from "../../components/ChatInput";
-import { sendQuestion, getRecommendationsByCategory } from "../../api";
+import { sendQuestion, sendAmbiguousUnknown, getRecommendationsByCategory } from "../../api";
 import Navbar from '../../components/Navbar';
 
 const UserPage = () => {
@@ -71,13 +71,13 @@ const UserPage = () => {
     };
 
     const handleSend = async (question) => {
-        if (waitingForResponse) return; // cegah double send
+        if (waitingForResponse) return;
 
         const userMessage = { sender: "user", text: question };
         setMessages((prev) => [...prev, userMessage]);
-        setWaitingForResponse(true);                  // chat loading ON
-        setRecommendations([]);                       // hapus rekomendasi lama
-        setRecommendationsLoading(false);              // matikan skeleton rekomendasi
+        setWaitingForResponse(true);
+        setRecommendations([]);
+        setRecommendationsLoading(false);
 
         try {
             const data = await sendQuestion(question);
@@ -87,9 +87,9 @@ const UserPage = () => {
                     sender: "bot",
                     text: data.jawaban,
                     ambiguousOptions: data.opsi_pertanyaan,
+                    originalUserQuestion: question, // SIMPAN PERTANYAAN ASLI USER
                 };
                 setMessages((prev) => [...prev, botMessage]);
-                // tidak fetch rekomendasi karena ambigu
             } else {
                 const botMessage = { sender: "bot", text: data.jawaban };
                 setMessages((prev) => [...prev, botMessage]);
@@ -105,11 +105,55 @@ const UserPage = () => {
                 { sender: "bot", text: "Terjadi kesalahan koneksi dengan server." },
             ]);
         } finally {
-            setWaitingForResponse(false); // chat loading OFF
+            setWaitingForResponse(false);
         }
     };
 
-    const handleAmbiguousOptionClick = (option) => {
+    const handleAmbiguousNotFound = async (originalQuestion) => {
+        if (waitingForResponse) return;
+        
+        setWaitingForResponse(true);
+        setRecommendations([]);
+        setRecommendationsLoading(false);
+        
+        try {
+            const data = await sendAmbiguousUnknown(originalQuestion);
+            
+            // Hapus pesan bot yang berisi opsi ambigu
+            setMessages(prev => {
+                const newMessages = [...prev];
+                for (let i = newMessages.length - 1; i >= 0; i--) {
+                    if (newMessages[i].sender === "bot" && newMessages[i].ambiguousOptions) {
+                        newMessages.splice(i, 1);
+                        break;
+                    }
+                }
+                return newMessages;
+            });
+            
+            // Tambahkan pesan bot baru
+            const botMessage = { sender: "bot", text: data.jawaban };
+            setMessages(prev => [...prev, botMessage]);
+            
+        } catch (error) {
+            console.error("Error handling ambiguous unknown:", error);
+            setMessages(prev => [
+                ...prev,
+                { sender: "bot", text: "Terjadi kesalahan. Silakan coba lagi." },
+            ]);
+        } finally {
+            setWaitingForResponse(false);
+        }
+    };
+
+    const handleAmbiguousOptionClick = (option, originalUserQuestion) => {
+        // Cek apakah ini tombol "Pertanyaan saya tidak ada"
+        if (option === "__AMBIGUOUS_NOT_FOUND__") {
+            handleAmbiguousNotFound(originalUserQuestion);
+            return;
+        }
+        
+        // Logika sebelumnya untuk opsi biasa
         setMessages(prev => {
             const newMessages = [...prev];
             for (let i = newMessages.length - 1; i >= 0; i--) {
@@ -147,8 +191,8 @@ const UserPage = () => {
                     <div className="max-w-3xl mx-auto w-full space-y-3">
                         <ChatWindow 
                             messages={messages}
-                            loading={waitingForResponse}          // skeleton chat bubble
-                            recommendationsLoading={recommendationsLoading}  // skeleton rekomendasi
+                            loading={waitingForResponse}
+                            recommendationsLoading={recommendationsLoading}
                             recommendations={recommendations}
                             onAmbiguousOptionClick={handleAmbiguousOptionClick}
                             onRecommendationClick={handleSend}
