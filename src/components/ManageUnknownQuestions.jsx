@@ -19,7 +19,7 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
         setLoading(true);
         setError('');
         try {
-            const result = await getUnknownQuestions(page, 20);
+            const result = await getUnknownQuestions(page, 10); // UBahkan ke 10 data per halaman
             setData(result.data);
             setCurrentPage(result.page);
             setTotalPages(result.total_pages);
@@ -128,9 +128,9 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
         }
     };
 
-    // Fungsi untuk mendapatkan nomor urut (berdasarkan halaman dan index)
+    // Fungsi untuk mendapatkan nomor urut (PERHITUNGAN DIPERBAIKI)
     const getRowNumber = (index) => {
-        return ((currentPage - 1) * 20) + index + 1;
+        return ((currentPage - 1) * 10) + index + 1; // MENGGUNAKAN 10, BUKAN 20
     };
 
     if (loading) {
@@ -371,9 +371,9 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                 </div>
                             )}
 
-                            {/* Info */}
+                            {/* Info - PERBAIKI PERHITUNGAN */}
                             <div className="text-center text-xs text-gray-500 mt-4">
-                                Menampilkan {((currentPage - 1) * 20) + 1} - {Math.min(currentPage * 20, totalData)} dari {totalData} pertanyaan
+                                Menampilkan {((currentPage - 1) * 10) + 1} - {Math.min(currentPage * 10, totalData)} dari {totalData} pertanyaan
                             </div>
                         </>
                     )}
