@@ -8,7 +8,7 @@ const ChatWindow = ({ messages, loading, recommendationsLoading, recommendations
                 <div key={idx}>
                     <ChatBubble sender={msg.sender} text={msg.text} />
                     {msg.sender === 'bot' && msg.ambiguousOptions && (
-                        <div className="flex flex-col space-y-2 mt-2 ml-12">
+                        <div className="flex flex-col space-y-2 mt-2 ml-5">
                             {msg.ambiguousOptions.map((opt, i) => (
                                 <button
                                     key={i}
