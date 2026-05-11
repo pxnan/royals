@@ -30,7 +30,7 @@ const SidebarAdmin = () => {
             <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
             <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64 shadow-xl relative z-10">
                 {/* Logo Section */}
-                <div className="w-full border-b border-base-300 mb-4">
+                <div className="w-full border-b border-base-300">
                     <div className="flex items-center justify-center py-4 px-2 is-drawer-close:px-0">
                         <Link to="/admin" onClick={closeDrawer}>
                             <img 
