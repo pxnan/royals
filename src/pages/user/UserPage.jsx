@@ -5,6 +5,7 @@ import { sendQuestion, getRecommendationsByCategory } from "../../api";
 import Navbar from '../../components/Navbar';
 
 const UserPage = () => {
+    // State untuk histori chat
     const [messages, setMessages] = useState(() => {
         const saved = localStorage.getItem("chatHistory");
         if (saved) {
@@ -24,10 +25,13 @@ const UserPage = () => {
         }
         return [];
     });
-    const [waitingForResponse, setWaitingForResponse] = useState(false); // untuk mencegah double send
+
+    // ========== LOADING STATES (DIPISAH) ==========
+    const [waitingForResponse, setWaitingForResponse] = useState(false); // loading untuk chat bubble
+    const [recommendationsLoading, setRecommendationsLoading] = useState(false); // loading untuk rekomendasi
+
     const [hasWelcomed, setHasWelcomed] = useState(false);
     const [recommendations, setRecommendations] = useState([]);
-    const [recommendationsLoading, setRecommendationsLoading] = useState(false);
     const chatEndRef = useRef(null);
 
     useEffect(() => {
@@ -53,7 +57,8 @@ const UserPage = () => {
     }, [messages, hasWelcomed]);
 
     const fetchRecommendationsByCategory = async (kategori) => {
-        setRecommendationsLoading(true);
+        setWaitingForResponse(false); // pastikan chat loading mati sebelum fetch rekomendasi
+        setRecommendationsLoading(true); // hanya rekomendasi yang loading
         try {
             const data = await getRecommendationsByCategory(kategori);
             setRecommendations(data.recommendations || []);
@@ -66,12 +71,13 @@ const UserPage = () => {
     };
 
     const handleSend = async (question) => {
-        if (waitingForResponse) return;
+        if (waitingForResponse) return; // cegah double send
+
         const userMessage = { sender: "user", text: question };
         setMessages((prev) => [...prev, userMessage]);
-        setWaitingForResponse(true);
-        setRecommendations([]);
-        setRecommendationsLoading(false);
+        setWaitingForResponse(true);                  // chat loading ON
+        setRecommendations([]);                       // hapus rekomendasi lama
+        setRecommendationsLoading(false);              // matikan skeleton rekomendasi
 
         try {
             const data = await sendQuestion(question);
@@ -83,11 +89,9 @@ const UserPage = () => {
                     ambiguousOptions: data.opsi_pertanyaan,
                 };
                 setMessages((prev) => [...prev, botMessage]);
+                // tidak fetch rekomendasi karena ambigu
             } else {
-                const botMessage = {
-                    sender: "bot",
-                    text: data.jawaban,
-                };
+                const botMessage = { sender: "bot", text: data.jawaban };
                 setMessages((prev) => [...prev, botMessage]);
 
                 if (data.kategori) {
@@ -101,12 +105,11 @@ const UserPage = () => {
                 { sender: "bot", text: "Terjadi kesalahan koneksi dengan server." },
             ]);
         } finally {
-            setWaitingForResponse(false);
+            setWaitingForResponse(false); // chat loading OFF
         }
     };
 
     const handleAmbiguousOptionClick = (option) => {
-        // Hapus pesan bot terakhir yang memiliki ambiguousOptions
         setMessages(prev => {
             const newMessages = [...prev];
             for (let i = newMessages.length - 1; i >= 0; i--) {
@@ -129,6 +132,7 @@ const UserPage = () => {
         setHasWelcomed(true);
         setRecommendations([]);
         setRecommendationsLoading(false);
+        setWaitingForResponse(false); // reset juga jika sedang loading
     };
 
     return (
@@ -143,13 +147,14 @@ const UserPage = () => {
                     <div className="max-w-3xl mx-auto w-full space-y-3">
                         <ChatWindow 
                             messages={messages}
-                            recommendationsLoading={recommendationsLoading}
+                            loading={waitingForResponse}          // skeleton chat bubble
+                            recommendationsLoading={recommendationsLoading}  // skeleton rekomendasi
                             recommendations={recommendations}
                             onAmbiguousOptionClick={handleAmbiguousOptionClick}
                             onRecommendationClick={handleSend}
                         />
 
-                        {/* Rekomendasi awal (fallback) - hanya jika belum ada rekomendasi dan belum ada skeleton */}
+                        {/* Rekomendasi awal (fallback) - hanya saat tidak ada rekomendasi dan tidak loading */}
                         {messages.length === 1 && !recommendationsLoading && recommendations.length === 0 && (
                             <div className="flex flex-col space-y-2 mt-4 px-5">
                                 <p className="text-xs text-gray-500 font-semibold mb-1">Mungkin Anda ingin bertanya:</p>
