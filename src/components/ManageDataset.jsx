@@ -22,22 +22,27 @@ const ManageDataset = ({ onDataChange }) => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const fetchData = async (page = 1, searchTerm = "", kategori = "") => {
-    setLoading(true);
-    setError("");
-    try {
-      const result = await getAllData(page, 20, searchTerm, kategori);
-      setData(result.data);
-      setCurrentPage(result.page);
-      setTotalPages(result.total_pages);
-      setTotalData(result.total_data);
-      if (result.categories) setCategories(result.categories);
-    } catch (err) {
-      setError(err.message || "Gagal mengambil data");
-      console.error("Error:", err);
-    } finally {
-      setLoading(false);
+  setLoading(true);
+  setError("");
+  try {
+    const result = await getAllData(page, 20, searchTerm, kategori);
+    setData(result.data);
+    setCurrentPage(result.page);
+    setTotalPages(result.total_pages);
+    setTotalData(result.total_data);
+    // Gunakan categories dari result (prioritas)
+    if (result.categories && result.categories.length > 0) {
+      setCategories(result.categories);
+    } else if (result.categories) {
+      setCategories(result.categories);
     }
-  };
+  } catch (err) {
+    setError(err.message || "Gagal mengambil data");
+    console.error("Error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchData(currentPage, search, kategoriFilter);

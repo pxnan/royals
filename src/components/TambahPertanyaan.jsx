@@ -21,13 +21,18 @@ const TambahPertanyaan = ({ onSuccess, onCancel }) => {
     }, []);
 
     const fetchKategori = async () => {
+        setLoadingKategori(true);
         try {
             const data = await getKategori();
             if (data.kategori) {
                 setKategoriList(data.kategori);
+                console.log('Kategori loaded:', data.kategori);
+            } else {
+                console.warn('No categories received from API');
             }
         } catch (err) {
             console.error('Gagal mengambil kategori:', err);
+            setError('Gagal memuat daftar kategori');
         } finally {
             setLoadingKategori(false);
         }
@@ -83,6 +88,7 @@ const TambahPertanyaan = ({ onSuccess, onCancel }) => {
         try {
             const data = await tambahData(formData);
             setSuccess(data.message || 'Data berhasil ditambahkan!');
+            
             // Reset form
             setFormData({
                 pertanyaan: '',
@@ -91,13 +97,16 @@ const TambahPertanyaan = ({ onSuccess, onCancel }) => {
             });
             setNewKategori('');
             setShowNewKategori(false);
-            // Refresh kategori list
-            fetchKategori();
+            
+            // Refresh kategori list setelah menambah data
+            await fetchKategori();
+            
             if (onSuccess) onSuccess(data);
             
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
+            // Optional: redirect setelah 2 detik (jika diperlukan)
+            // setTimeout(() => {
+            //     window.location.reload();
+            // }, 2000);
         } catch (err) {
             setError(err.message || 'Gagal menambahkan data');
             console.error('Error:', err);
@@ -181,6 +190,11 @@ const TambahPertanyaan = ({ onSuccess, onCancel }) => {
                                 ))}
                                 <option value="new">+ Tambah Kategori Baru</option>
                             </select>
+                        )}
+                        {kategoriList.length === 0 && !loadingKategori && (
+                            <p className="text-xs text-warning mt-1">
+                                Belum ada kategori. Silakan tambah kategori baru terlebih dahulu.
+                            </p>
                         )}
                     </div>
 
