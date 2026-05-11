@@ -128,6 +128,11 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
         }
     };
 
+    // Fungsi untuk mendapatkan nomor urut (berdasarkan halaman dan index)
+    const getRowNumber = (index) => {
+        return ((currentPage - 1) * 20) + index + 1;
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center py-20">
@@ -239,14 +244,14 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                                     onChange={handleSelectAll}
                                                 />
                                             </th>
-                                            <th className="w-16">ID</th>
+                                            <th className="w-16 text-center">No</th>
                                             <th className="min-w-[300px]">Pertanyaan</th>
                                             <th className="w-48">Tanggal</th>
                                             <th className="w-24 text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {data.map((item) => (
+                                        {data.map((item, index) => (
                                             <tr key={item.id} className="hover:bg-base-200 transition-colors">
                                                 <td>
                                                     <input
@@ -256,7 +261,9 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                                         onChange={() => handleSelectItem(item.id)}
                                                     />
                                                 </td>
-                                                <td className="font-medium">{item.id}</td>
+                                                <td className="text-center font-medium">
+                                                    {getRowNumber(index)}
+                                                </td>
                                                 <td className="whitespace-normal break-words">
                                                     <div className="group relative pr-8">
                                                         <span className="text-sm">{item.pertanyaan}</span>
