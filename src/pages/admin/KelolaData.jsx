@@ -25,7 +25,7 @@ const KelolaData = () => {
     // Update URL ketika tab berubah
     const handleTabChange = (tab) => {
         setActiveTab(tab);
-        navigate(`/admin/input-pertanyaan?tab=${tab}`, { replace: true });
+        navigate(`/admin/kelola-data?tab=${tab}`, { replace: true });
     };
 
     // Update state ketika URL berubah (misal dari link eksternal)
