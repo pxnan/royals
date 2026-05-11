@@ -32,19 +32,12 @@ const SidebarAdmin = () => {
                 {/* Logo Section */}
                 <div className="w-full border-b border-base-300 mb-4">
                     <div className="flex items-center justify-center py-4 px-2 is-drawer-close:px-0">
-                        <Link 
-                            to="/admin" 
-                            onClick={closeDrawer}
-                            className="flex items-center justify-center w-full"
-                        >
+                        <Link to="/admin" onClick={closeDrawer}>
                             <img 
                                 src="/logo.png" 
                                 alt="Logo" 
                                 className="h-10 w-auto object-contain"
                             />
-                            <span className="is-drawer-close:hidden ml-2 text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                Admin Panel
-                            </span>
                         </Link>
                     </div>
                 </div>
