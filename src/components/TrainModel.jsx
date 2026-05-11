@@ -187,7 +187,7 @@ const TrainModel = () => {
                     <h2 className="card-title text-xl">Panduan</h2>
                     <ul className="list-disc list-inside space-y-2 text-gray-600">
                         <li>Data latih diambil dari database (tabel <code className="px-1 bg-base-200 rounded">dataset</code>).</li>
-                        <li>Training akan memproses semua data dan menyimpan model ke folder <code className="px-1 bg-base-200 rounded">model/</code>.</li>
+                        <li>Training akan memproses semua data dan menyimpan model ke <code className="px-1 bg-base-200 rounded">model_qa.pkl</code>.</li>
                         <li>Setelah training selesai, chatbot akan langsung menggunakan model terbaru.</li>
                         <li>Waktu training tergantung jumlah data (biasanya 5-30 detik).</li>
                         <li>Jika training memakan waktu lama, harap bersabar dan jangan refresh halaman.</li>
