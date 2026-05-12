@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import SidebarAdmin from "../../components/SidebarAdmin";
 import NavbarAdmin from "../../components/NavbarAdmin";
-import { getStats, getUnknownQuestions, getKategori, cekCSV } from "../../api";
+import { getStats, getUnknownQuestions, getKategori, cekCSV, getModelInfo } from "../../api";
 
 const AdminPage = () => {
     const [stats, setStats] = useState({
         totalQuestions: 0,
         totalCategories: 0,
         unknownQuestions: 0,
-        modelStatus: 'Loading...'
+        modelStatus: 'Loading...',
+        modelLoaded: false
     });
 
     const [recentUnknown, setRecentUnknown] = useState([]);
@@ -16,6 +17,7 @@ const AdminPage = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [checkingModel, setCheckingModel] = useState(false);
 
     useEffect(() => {
         fetchDashboardData();
@@ -28,11 +30,28 @@ const AdminPage = () => {
             // ✅ Gunakan endpoint /api/stats untuk data statistik utama
             const statsData = await getStats();
 
+            // Cek status model secara terpisah jika perlu
+            let modelLoaded = statsData.model_loaded || false;
+            
+            // Jika model_loaded masih false, coba cek via /model-info
+            if (!modelLoaded) {
+                setCheckingModel(true);
+                try {
+                    const modelInfo = await getModelInfo();
+                    modelLoaded = modelInfo.model_loaded || false;
+                } catch (err) {
+                    console.error("Error checking model info:", err);
+                } finally {
+                    setCheckingModel(false);
+                }
+            }
+
             setStats({
                 totalQuestions: statsData.total_questions || 0,
                 totalCategories: statsData.total_categories || 0,
                 unknownQuestions: statsData.total_unknown_questions || 0,
-                modelStatus: statsData.model_loaded ? 'Active' : 'Inactive'
+                modelStatus: modelLoaded ? 'Active' : 'Inactive',
+                modelLoaded: modelLoaded
             });
 
             // Ambil data lain yang tidak disediakan oleh /stats
@@ -60,6 +79,24 @@ const AdminPage = () => {
             setError(err.message || 'Gagal memuat data dashboard');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Fungsi untuk refresh manual status model
+    const refreshModelStatus = async () => {
+        setCheckingModel(true);
+        try {
+            const modelInfo = await getModelInfo();
+            const modelLoaded = modelInfo.model_loaded || false;
+            setStats(prev => ({
+                ...prev,
+                modelStatus: modelLoaded ? 'Active' : 'Inactive',
+                modelLoaded: modelLoaded
+            }));
+        } catch (err) {
+            console.error("Error checking model info:", err);
+        } finally {
+            setCheckingModel(false);
         }
     };
 
@@ -179,13 +216,39 @@ const AdminPage = () => {
                                         <div className="flex items-start justify-between">
                                             <div>
                                                 <p className="text-gray-500 text-xs font-medium">Status Model</p>
-                                                <p className="text-lg font-bold text-success mt-1">{stats.modelStatus}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <p className={`text-lg font-bold ${stats.modelStatus === 'Active' ? 'text-success' : 'text-warning'}`}>
+                                                        {stats.modelStatus}
+                                                    </p>
+                                                    {checkingModel && (
+                                                        <span className="loading loading-spinner loading-xs"></span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="text-success">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <div className={`${stats.modelStatus === 'Active' ? 'text-success' : 'text-warning'}`}>
+                                                {stats.modelStatus === 'Active' ? (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {/* Tombol refresh status model */}
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={refreshModelStatus} 
+                                                className="btn btn-xs btn-ghost text-gray-500"
+                                                disabled={checkingModel}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                                 </svg>
-                                            </div>
+                                                Refresh Status
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
