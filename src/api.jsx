@@ -85,7 +85,7 @@ export async function sendAmbiguousUnknown(question) {
 }
 
 export async function getRecommendations() {
-    const response = await fetch(`${API_BASE_URL}/api/api/recommendations`, {
+    const response = await fetch(`${API_BASE_URL}/api/recommendations`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -96,7 +96,7 @@ export async function getRecommendations() {
 }
 
 export async function getRecommendationsByCategory(kategori) {
-    const response = await fetch(`${API_BASE_URL}/api/api/recommendations/by-category?kategori=${encodeURIComponent(kategori)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/recommendations/by-category?kategori=${encodeURIComponent(kategori)}`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -212,7 +212,7 @@ export async function getAdminProfile(token) {
 
 // ==================== ENDPOINT KELOLA ADMIN ====================
 export async function getAdmins(token, page = 1, perPage = 10, search = "") {
-    let url = `${API_BASE_URL}/api/api/admins?page=${page}&per_page=${perPage}`;
+    let url = `${API_BASE_URL}/api/admins?page=${page}&per_page=${perPage}`;
     if (search) url += `&search=${encodeURIComponent(search)}`;
     
     const response = await fetch(url, {
@@ -229,7 +229,7 @@ export async function getAdmins(token, page = 1, perPage = 10, search = "") {
 }
 
 export async function createAdmin(token, adminData) {
-    const response = await fetch(`${API_BASE_URL}/api/api/admins`, {
+    const response = await fetch(`${API_BASE_URL}/api/admins`, {
         method: "POST",
         headers: getAuthHeaders(token),
         body: JSON.stringify(adminData),
@@ -244,7 +244,7 @@ export async function createAdmin(token, adminData) {
 }
 
 export async function updateAdmin(token, adminId, adminData) {
-    const response = await fetch(`${API_BASE_URL}/api/api/admins/${adminId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/admins/${adminId}`, {
         method: "PUT",
         headers: getAuthHeaders(token),
         body: JSON.stringify(adminData),
@@ -259,7 +259,7 @@ export async function updateAdmin(token, adminId, adminData) {
 }
 
 export async function resetAdminPassword(token, adminId, newPassword) {
-    const response = await fetch(`${API_BASE_URL}/api/api/admins/${adminId}/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/admins/${adminId}/reset-password`, {
         method: "POST",
         headers: getAuthHeaders(token),
         body: JSON.stringify({ new_password: newPassword }),
@@ -274,7 +274,7 @@ export async function resetAdminPassword(token, adminId, newPassword) {
 }
 
 export async function deleteAdmin(token, adminId) {
-    const response = await fetch(`${API_BASE_URL}/api/api/admins/${adminId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/admins/${adminId}`, {
         method: "DELETE",
         headers: getAuthHeaders(token),
     });
@@ -433,7 +433,7 @@ export async function fixCSV() {
 
 // ==================== ENDPOINT STATISTIK ====================
 export async function getStats() {
-    const response = await fetch(`${API_BASE_URL}/api/api/stats`, {
+    const response = await fetch(`${API_BASE_URL}/api/stats`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -446,7 +446,7 @@ export async function getStats() {
 }
 
 export async function getLoginLogs(token, page = 1, perPage = 20) {
-    const response = await fetch(`${API_BASE_URL}/api/api/login-logs?page=${page}&per_page=${perPage}`, {
+    const response = await fetch(`${API_BASE_URL}/api/login-logs?page=${page}&per_page=${perPage}`, {
         method: "GET",
         headers: getAuthHeaders(token),
     });
@@ -460,7 +460,7 @@ export async function getLoginLogs(token, page = 1, perPage = 20) {
 }
 
 export async function resetDatabase(token) {
-    const response = await fetch(`${API_BASE_URL}/api/api/reset-database`, {
+    const response = await fetch(`${API_BASE_URL}/api/reset-database`, {
         method: "POST",
         headers: getAuthHeaders(token),
     });
