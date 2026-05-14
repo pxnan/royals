@@ -359,7 +359,7 @@ const AdminPage = () => {
                                     )}
                                 </div>
 
-                                {/* Recent Unknown - Loading terpisah dengan 6 baris + tombol skeleton */}
+                                {/* Recent Unknown */}
                                 <div className="card bg-base-100 shadow-xl mb-4 md:mb-8">
                                     <div className="card-body p-3 sm:p-4 md:p-6">
                                         <div className="flex items-center justify-between mb-2 md:mb-4">
@@ -384,15 +384,17 @@ const AdminPage = () => {
                                                     <table className="table table-zebra w-full text-xs sm:text-sm">
                                                         <thead>
                                                             <tr className="text-xs">
-                                                                <th className="w-12 sm:w-16">ID</th>
+                                                                <th className="w-12 sm:w-16 text-center">No</th>
                                                                 <th className="min-w-[120px]">Pertanyaan</th>
                                                                 <th className="w-24 sm:w-32">Tanggal</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            {recentUnknown.map((item) => (
+                                                            {recentUnknown.map((item, index) => (
                                                                 <tr key={item.id}>
-                                                                    <td className="text-xs sm:text-sm">{item.id}</td>
+                                                                    <td className="text-center text-xs sm:text-sm font-medium">
+                                                                        {index + 1}
+                                                                    </td>
                                                                     <td className="break-words text-xs sm:text-sm">{item.pertanyaan}</td>
                                                                     <td className="text-[10px] sm:text-xs whitespace-nowrap">{formatDate(item.created_at)}</td>
                                                                 </tr>
