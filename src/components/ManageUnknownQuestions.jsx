@@ -74,7 +74,6 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
     const [totalData, setTotalData] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
-    const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
     const [showDeleteSelectedModal, setShowDeleteSelectedModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedItems, setSelectedItems] = useState([]);
@@ -268,15 +267,6 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                     title={`Hapus ${selectedItems.length} terpilih`}
                                 >
                                     🗑️ Hapus Terpilih ({selectedItems.length})
-                                </button>
-                            )}
-                            {!dataLoading && totalData > 0 && (
-                                <button
-                                    className="btn btn-outline btn-warning btn-sm"
-                                    onClick={() => setShowDeleteAllModal(true)}
-                                    title="Hapus Semua"
-                                >
-                                    🗑️ Hapus Semua
                                 </button>
                             )}
                         </div>
@@ -488,29 +478,6 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                 Ya, Hapus {selectedItems.length} Pertanyaan
                             </button>
                             <button className="btn" onClick={() => setShowDeleteSelectedModal(false)}>
-                                Batal
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete All Confirmation Modal */}
-            {showDeleteAllModal && (
-                <div className="modal modal-open">
-                    <div className="modal-box">
-                        <h3 className="font-bold text-lg text-warning">⚠️ Konfirmasi Hapus Semua</h3>
-                        <p className="py-4">
-                            Apakah Anda yakin ingin menghapus <span className="font-bold text-warning">SEMUA</span> pertanyaan tidak dikenal?
-                            <br />
-                            <br />
-                            <span className="text-error font-bold">Tindakan ini tidak dapat dibatalkan!</span>
-                        </p>
-                        <div className="modal-action">
-                            <button className="btn btn-error" onClick={handleDeleteAll}>
-                                Ya, Hapus Semua
-                            </button>
-                            <button className="btn" onClick={() => setShowDeleteAllModal(false)}>
                                 Batal
                             </button>
                         </div>
