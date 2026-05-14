@@ -74,6 +74,8 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
     const [totalData, setTotalData] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
+    const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
+    const [showDeleteSelectedModal, setShowDeleteSelectedModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
@@ -137,6 +139,27 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
         }
     };
 
+    const handleDeleteSelectedClick = () => {
+        setShowDeleteSelectedModal(true);
+    };
+
+    const handleDeleteSelectedConfirm = async () => {
+        try {
+            for (const id of selectedItems) {
+                await deleteUnknownQuestion(id);
+            }
+            setSuccessMessage(`${selectedItems.length} pertanyaan berhasil dihapus!`);
+            setTimeout(() => setSuccessMessage(''), 3000);
+            setSelectedItems([]);
+            setSelectAll(false);
+            setShowDeleteSelectedModal(false);
+            fetchData(currentPage);
+            if (onDataChange) onDataChange();
+        } catch (err) {
+            setError(err.message || 'Gagal menghapus data terpilih');
+        }
+    };
+
     const handleSelectAll = () => {
         if (selectAll) {
             setSelectedItems([]);
@@ -152,18 +175,6 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
         } else {
             setSelectedItems([...selectedItems, id]);
         }
-    };
-
-    const handleDeleteSelected = async () => {
-        for (const id of selectedItems) {
-            await deleteUnknownQuestion(id);
-        }
-        setSuccessMessage(`${selectedItems.length} pertanyaan berhasil dihapus!`);
-        setTimeout(() => setSuccessMessage(''), 3000);
-        setSelectedItems([]);
-        setSelectAll(false);
-        fetchData(currentPage);
-        if (onDataChange) onDataChange();
     };
 
     const navigateToAddTab = () => {
@@ -253,10 +264,19 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                             {!dataLoading && selectedItems.length > 0 && (
                                 <button
                                     className="btn btn-error btn-sm"
-                                    onClick={handleDeleteSelected}
+                                    onClick={handleDeleteSelectedClick}
                                     title={`Hapus ${selectedItems.length} terpilih`}
                                 >
                                     🗑️ Hapus Terpilih ({selectedItems.length})
+                                </button>
+                            )}
+                            {!dataLoading && totalData > 0 && (
+                                <button
+                                    className="btn btn-outline btn-warning btn-sm"
+                                    onClick={() => setShowDeleteAllModal(true)}
+                                    title="Hapus Semua"
+                                >
+                                    🗑️ Hapus Semua
                                 </button>
                             )}
                         </div>
@@ -445,6 +465,52 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                 Hapus
                             </button>
                             <button className="btn" onClick={() => setShowDeleteModal(false)}>
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Selected Confirmation Modal */}
+            {showDeleteSelectedModal && (
+                <div className="modal modal-open">
+                    <div className="modal-box">
+                        <h3 className="font-bold text-lg text-warning">⚠️ Konfirmasi Hapus Terpilih</h3>
+                        <p className="py-4">
+                            Apakah Anda yakin ingin menghapus <span className="font-bold text-warning">{selectedItems.length}</span> pertanyaan yang dipilih?
+                            <br />
+                            <br />
+                            <span className="text-error font-bold">Tindakan ini tidak dapat dibatalkan!</span>
+                        </p>
+                        <div className="modal-action">
+                            <button className="btn btn-error" onClick={handleDeleteSelectedConfirm}>
+                                Ya, Hapus {selectedItems.length} Pertanyaan
+                            </button>
+                            <button className="btn" onClick={() => setShowDeleteSelectedModal(false)}>
+                                Batal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete All Confirmation Modal */}
+            {showDeleteAllModal && (
+                <div className="modal modal-open">
+                    <div className="modal-box">
+                        <h3 className="font-bold text-lg text-warning">⚠️ Konfirmasi Hapus Semua</h3>
+                        <p className="py-4">
+                            Apakah Anda yakin ingin menghapus <span className="font-bold text-warning">SEMUA</span> pertanyaan tidak dikenal?
+                            <br />
+                            <br />
+                            <span className="text-error font-bold">Tindakan ini tidak dapat dibatalkan!</span>
+                        </p>
+                        <div className="modal-action">
+                            <button className="btn btn-error" onClick={handleDeleteAll}>
+                                Ya, Hapus Semua
+                            </button>
+                            <button className="btn" onClick={() => setShowDeleteAllModal(false)}>
                                 Batal
                             </button>
                         </div>
