@@ -1,8 +1,9 @@
 // src/api.jsx
 
 // ==================== KONFIGURASI API UNTUK VITE ====================
-// Gunakan proxy, jadi base URL relatif
-const API_BASE_URL = ''; // Kosongkan agar menggunakan proxy /api
+// Menggunakan import.meta.env dengan fallback untuk menghindari undefined
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Helper untuk logging hanya di development
 const devLog = (...args) => {
@@ -11,18 +12,20 @@ const devLog = (...args) => {
     }
 };
 
-// Helper function untuk headers (TANPA X-API-Key karena sudah di proxy)
+// Helper function untuk headers
 const getHeaders = (additionalHeaders = {}) => {
     return {
         "Content-Type": "application/json",
+        "X-API-Key": API_KEY,
         ...additionalHeaders
     };
 };
 
-// Helper function untuk headers dengan Authorization token (TANPA X-API-Key)
+// Helper function untuk headers dengan Authorization token
 const getAuthHeaders = (token, additionalHeaders = {}) => {
     return {
         "Content-Type": "application/json",
+        "X-API-Key": API_KEY,
         "Authorization": `Bearer ${token}`,
         ...additionalHeaders
     };
@@ -33,7 +36,7 @@ export async function login(username, password) {
     devLog("Login attempt with username:", username);
     devLog("API URL:", API_BASE_URL);
     
-    const response = await fetch(`/api/login`, {  // Gunakan /api prefix
+    const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({ username, password }),
@@ -52,7 +55,7 @@ export async function login(username, password) {
 
 // ==================== ENDPOINT CHATBOT ====================
 export async function sendQuestion(question) {
-    const response = await fetch(`/api/chat`, {
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({ pertanyaan: question }),
@@ -66,9 +69,9 @@ export async function sendQuestion(question) {
 }
 
 export async function sendAmbiguousUnknown(question) {
-    console.log("Mengirim pertanyaan ke server:", question);
+    console.log("Mengirim pertanyaan ke server:", question); // Debugging
     
-    const response = await fetch(`/api/chat/ambiguous-unknown`, {
+    const response = await fetch(`${API_BASE_URL}/api/chat/ambiguous-unknown`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify({ original_question: question }),
@@ -82,7 +85,7 @@ export async function sendAmbiguousUnknown(question) {
 }
 
 export async function getRecommendations() {
-    const response = await fetch(`/api/recommendations`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/recommendations`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -93,7 +96,7 @@ export async function getRecommendations() {
 }
 
 export async function getRecommendationsByCategory(kategori) {
-    const response = await fetch(`/api/recommendations/by-category?kategori=${encodeURIComponent(kategori)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/recommendations/by-category?kategori=${encodeURIComponent(kategori)}`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -105,7 +108,7 @@ export async function getRecommendationsByCategory(kategori) {
 
 // ==================== ENDPOINT UNKNOWN QUESTIONS ====================
 export async function getUnknownQuestions(page = 1, perPage = 10) {
-    const response = await fetch(`/api/pertanyaan-unknown?page=${page}&per_page=${perPage}`, {
+    const response = await fetch(`${API_BASE_URL}/api/pertanyaan-unknown?page=${page}&per_page=${perPage}`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -118,7 +121,7 @@ export async function getUnknownQuestions(page = 1, perPage = 10) {
 }
 
 export async function deleteUnknownQuestion(id) {
-    const response = await fetch(`/api/delete-unknown`, {
+    const response = await fetch(`${API_BASE_URL}/api/delete-unknown`, {
         method: "DELETE",
         headers: getHeaders(),
         body: JSON.stringify({ id }),
@@ -133,7 +136,7 @@ export async function deleteUnknownQuestion(id) {
 }
 
 export async function deleteAllUnknownQuestions() {
-    const response = await fetch(`/api/delete-all-unknown`, {
+    const response = await fetch(`${API_BASE_URL}/api/delete-all-unknown`, {
         method: "DELETE",
         headers: getHeaders(),
     });
@@ -148,7 +151,7 @@ export async function deleteAllUnknownQuestions() {
 
 // ==================== ENDPOINT AUTHENTICATION (sekunder) ====================
 export async function logout(token) {
-    const response = await fetch(`/api/logout`, {
+    const response = await fetch(`${API_BASE_URL}/api/logout`, {
         method: "POST",
         headers: getAuthHeaders(token),
     });
@@ -162,7 +165,7 @@ export async function logout(token) {
 }
 
 export async function verifyToken(token) {
-    const response = await fetch(`/api/verify-token`, {
+    const response = await fetch(`${API_BASE_URL}/api/verify-token`, {
         method: "GET",
         headers: getAuthHeaders(token),
     });
@@ -175,7 +178,7 @@ export async function verifyToken(token) {
 }
 
 export async function changePassword(token, oldPassword, newPassword, confirmPassword) {
-    const response = await fetch(`/api/change-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/change-password`, {
         method: "POST",
         headers: getAuthHeaders(token),
         body: JSON.stringify({ 
@@ -194,7 +197,7 @@ export async function changePassword(token, oldPassword, newPassword, confirmPas
 }
 
 export async function getAdminProfile(token) {
-    const response = await fetch(`/api/admin-profile`, {
+    const response = await fetch(`${API_BASE_URL}/api/admin-profile`, {
         method: "GET",
         headers: getAuthHeaders(token),
     });
@@ -209,7 +212,7 @@ export async function getAdminProfile(token) {
 
 // ==================== ENDPOINT KELOLA ADMIN ====================
 export async function getAdmins(token, page = 1, perPage = 10, search = "") {
-    let url = `/api/admins?page=${page}&per_page=${perPage}`;
+    let url = `${API_BASE_URL}/api/api/admins?page=${page}&per_page=${perPage}`;
     if (search) url += `&search=${encodeURIComponent(search)}`;
     
     const response = await fetch(url, {
@@ -226,7 +229,7 @@ export async function getAdmins(token, page = 1, perPage = 10, search = "") {
 }
 
 export async function createAdmin(token, adminData) {
-    const response = await fetch(`/api/admins`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/admins`, {
         method: "POST",
         headers: getAuthHeaders(token),
         body: JSON.stringify(adminData),
@@ -241,7 +244,7 @@ export async function createAdmin(token, adminData) {
 }
 
 export async function updateAdmin(token, adminId, adminData) {
-    const response = await fetch(`/api/admins/${adminId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/admins/${adminId}`, {
         method: "PUT",
         headers: getAuthHeaders(token),
         body: JSON.stringify(adminData),
@@ -256,7 +259,7 @@ export async function updateAdmin(token, adminId, adminData) {
 }
 
 export async function resetAdminPassword(token, adminId, newPassword) {
-    const response = await fetch(`/api/admins/${adminId}/reset-password`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/admins/${adminId}/reset-password`, {
         method: "POST",
         headers: getAuthHeaders(token),
         body: JSON.stringify({ new_password: newPassword }),
@@ -271,7 +274,7 @@ export async function resetAdminPassword(token, adminId, newPassword) {
 }
 
 export async function deleteAdmin(token, adminId) {
-    const response = await fetch(`/api/admins/${adminId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/admins/${adminId}`, {
         method: "DELETE",
         headers: getAuthHeaders(token),
     });
@@ -286,7 +289,7 @@ export async function deleteAdmin(token, adminId) {
 
 // ==================== ENDPOINT DATASET MANAGEMENT ====================
 export async function getAllData(page = 1, perPage = 20, search = "", kategori = "") {
-    let url = `/api/get-all-data?page=${page}&per_page=${perPage}`;
+    let url = `${API_BASE_URL}/api/get-all-data?page=${page}&per_page=${perPage}`;
     if (search) url += `&search=${encodeURIComponent(search)}`;
     if (kategori) url += `&kategori=${encodeURIComponent(kategori)}`;
     
@@ -303,7 +306,7 @@ export async function getAllData(page = 1, perPage = 20, search = "", kategori =
 }
 
 export async function tambahData(data) {
-    const response = await fetch(`/api/tambah-data`, {
+    const response = await fetch(`${API_BASE_URL}/api/tambah-data`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify(data),
@@ -318,7 +321,7 @@ export async function tambahData(data) {
 }
 
 export async function updateData(id, data) {
-    const response = await fetch(`/api/update-data`, {
+    const response = await fetch(`${API_BASE_URL}/api/update-data`, {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify({ id, ...data }),
@@ -331,7 +334,7 @@ export async function updateData(id, data) {
 }
 
 export async function deleteData(id) {
-    const response = await fetch(`/api/delete-data`, {
+    const response = await fetch(`${API_BASE_URL}/api/delete-data`, {
         method: "DELETE",
         headers: getHeaders(),
         body: JSON.stringify({ id }),
@@ -345,7 +348,7 @@ export async function deleteData(id) {
 
 // ==================== ENDPOINT BULK DELETE ====================
 export async function deleteBulkData(indices) {
-    const response = await fetch(`/api/delete-bulk-data`, {
+    const response = await fetch(`${API_BASE_URL}/api/delete-bulk-data`, {
         method: "DELETE",
         headers: getHeaders(),
         body: JSON.stringify({ indices }),
@@ -361,7 +364,7 @@ export async function deleteBulkData(indices) {
 
 // ==================== ENDPOINT TRAINING MODEL ====================
 export async function trainModel() {
-    const response = await fetch(`/api/train-model`, {
+    const response = await fetch(`${API_BASE_URL}/api/train-model`, {
         method: "POST",
         headers: getHeaders(),
     });
@@ -375,7 +378,7 @@ export async function trainModel() {
 }
 
 export async function getModelInfo() {
-    const response = await fetch(`/api/model-info`, {
+    const response = await fetch(`${API_BASE_URL}/api/model-info`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -388,7 +391,7 @@ export async function getModelInfo() {
 }
 
 export async function getKategori() {
-    const response = await fetch(`/api/kategori`, {
+    const response = await fetch(`${API_BASE_URL}/api/kategori`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -402,7 +405,7 @@ export async function getKategori() {
 
 // ==================== ENDPOINT DEBUG ====================
 export async function cekCSV() {
-    const response = await fetch(`/api/cek-csv`, {
+    const response = await fetch(`${API_BASE_URL}/api/cek-csv`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -415,7 +418,7 @@ export async function cekCSV() {
 }
 
 export async function fixCSV() {
-    const response = await fetch(`/api/fix-csv`, {
+    const response = await fetch(`${API_BASE_URL}/api/fix-csv`, {
         method: "POST",
         headers: getHeaders(),
     });
@@ -430,7 +433,7 @@ export async function fixCSV() {
 
 // ==================== ENDPOINT STATISTIK ====================
 export async function getStats() {
-    const response = await fetch(`/api/stats`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/stats`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -443,7 +446,7 @@ export async function getStats() {
 }
 
 export async function getLoginLogs(token, page = 1, perPage = 20) {
-    const response = await fetch(`/api/login-logs?page=${page}&per_page=${perPage}`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/login-logs?page=${page}&per_page=${perPage}`, {
         method: "GET",
         headers: getAuthHeaders(token),
     });
@@ -457,7 +460,7 @@ export async function getLoginLogs(token, page = 1, perPage = 20) {
 }
 
 export async function resetDatabase(token) {
-    const response = await fetch(`/api/reset-database`, {
+    const response = await fetch(`${API_BASE_URL}/api/api/reset-database`, {
         method: "POST",
         headers: getAuthHeaders(token),
     });
