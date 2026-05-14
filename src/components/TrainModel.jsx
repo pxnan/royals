@@ -1,11 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { trainModel, getModelInfo } from '../api';
 
+// Skeleton Components
+const ModelInfoSkeleton = () => (
+    <div className="card bg-base-100 shadow-xl">
+        <div className="card-body">
+            <div className="flex items-center gap-2 mb-4">
+                <div className="skeleton h-7 w-56"></div>
+                <div className="skeleton h-5 w-16"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="stat bg-base-200 rounded-lg p-4">
+                    <div className="skeleton h-4 w-28 mb-2"></div>
+                    <div className="skeleton h-8 w-16 mb-1"></div>
+                    <div className="skeleton h-3 w-32"></div>
+                </div>
+                <div className="stat bg-base-200 rounded-lg p-4">
+                    <div className="skeleton h-4 w-28 mb-2"></div>
+                    <div className="skeleton h-8 w-16 mb-1"></div>
+                    <div className="skeleton h-3 w-32"></div>
+                </div>
+            </div>
+            <div className="mt-4">
+                <div className="skeleton h-5 w-36 mb-2"></div>
+                <div className="flex flex-wrap gap-2">
+                    <div className="skeleton h-6 w-20"></div>
+                    <div className="skeleton h-6 w-24"></div>
+                    <div className="skeleton h-6 w-16"></div>
+                    <div className="skeleton h-6 w-28"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
 const TrainModel = () => {
     const [training, setTraining] = useState(false);
     const [trainingResult, setTrainingResult] = useState(null);
     const [modelInfo, setModelInfo] = useState(null);
-    const [loadingInfo, setLoadingInfo] = useState(true);
+    const [modelInfoLoading, setModelInfoLoading] = useState(true);
     const [error, setError] = useState('');
     const [statusMessage, setStatusMessage] = useState('');
 
@@ -14,7 +47,7 @@ const TrainModel = () => {
     }, []);
 
     const fetchModelInfo = async () => {
-        setLoadingInfo(true);
+        setModelInfoLoading(true);
         try {
             const data = await getModelInfo();
             setModelInfo(data);
@@ -22,7 +55,7 @@ const TrainModel = () => {
             setError('Gagal mengambil info model');
             console.error('Error:', err);
         } finally {
-            setLoadingInfo(false);
+            setModelInfoLoading(false);
         }
     };
 
@@ -37,78 +70,75 @@ const TrainModel = () => {
             const data = await trainModel();
 
             setStatusMessage('Training selesai! Menyimpan model...');
-            // Optional: sedikit delay agar user melihat pesan sukses
             await new Promise(resolve => setTimeout(resolve, 500));
 
             setTrainingResult(data);
-            await fetchModelInfo(); // Refresh info model setelah training
+            await fetchModelInfo();
             setStatusMessage('Model berhasil diperbarui!');
         } catch (err) {
             setError(err.message || 'Gagal melatih model');
             setStatusMessage('');
         } finally {
             setTraining(false);
-            // Reset status message setelah 3 detik
             setTimeout(() => {
                 if (statusMessage === 'Model berhasil diperbarui!') setStatusMessage('');
             }, 3000);
         }
     };
 
-    if (loadingInfo) {
-        return (
-            <div className="flex justify-center items-center py-20">
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-6">
-            {/* Informasi Model Saat Ini */}
+            {/* Informasi Model Saat Ini - Loading terpisah */}
             <div className="card bg-base-100 shadow-xl">
                 <div className="card-body">
-                    <h2 className="card-title text-2xl mb-4">
-                        Informasi Model Saat Ini
-                        <div className="badge badge-success ml-2">Active</div>
-                    </h2>
+                    <div className="flex items-center gap-2 mb-4">
+                        <h2 className="card-title text-2xl">
+                            Informasi Model Saat Ini
+                        </h2>
+                        {!modelInfoLoading && <div className="badge badge-success ml-2">Active</div>}
+                        {modelInfoLoading && <div className="skeleton h-5 w-16"></div>}
+                    </div>
 
-                    {modelInfo && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="stat bg-base-200 rounded-lg p-4">
-                                <div className="stat-title">Total Pertanyaan</div>
-                                <div className="stat-value text-primary text-3xl">{modelInfo.total_questions}</div>
-                                <div className="stat-desc">Data yang sudah dilatih</div>
+                    {modelInfoLoading ? (
+                        <ModelInfoSkeleton />
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="stat bg-base-200 rounded-lg p-4">
+                                    <div className="stat-title">Total Pertanyaan</div>
+                                    <div className="stat-value text-primary text-3xl">{modelInfo?.total_questions || 0}</div>
+                                    <div className="stat-desc">Data yang sudah dilatih</div>
+                                </div>
+                                <div className="stat bg-base-200 rounded-lg p-4">
+                                    <div className="stat-title">Total Kategori</div>
+                                    <div className="stat-value text-secondary text-3xl">{modelInfo?.categories?.length || 0}</div>
+                                    <div className="stat-desc">Kategori unik</div>
+                                </div>
                             </div>
-                            <div className="stat bg-base-200 rounded-lg p-4">
-                                <div className="stat-title">Total Kategori</div>
-                                <div className="stat-value text-secondary text-3xl">{modelInfo.categories?.length || 0}</div>
-                                <div className="stat-desc">Kategori unik</div>
-                            </div>
-                        </div>
-                    )}
 
-                    {modelInfo?.categories && (
-                        <div className="mt-4">
-                            <h3 className="font-semibold mb-2">Daftar Kategori:</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {modelInfo.categories.slice(0, 10).map((cat, idx) => (
-                                    <span key={idx} className="badge badge-outline badge-lg">
-                                        {cat}
-                                    </span>
-                                ))}
-                                {modelInfo.categories.length > 10 && (
-                                    <span className="badge badge-outline badge-lg">
-                                        +{modelInfo.categories.length - 10} lainnya
-                                    </span>
-                                )}
-                            </div>
-                        </div>
+                            {modelInfo?.categories && modelInfo.categories.length > 0 && (
+                                <div className="mt-4">
+                                    <h3 className="font-semibold mb-2">Daftar Kategori:</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {modelInfo.categories.slice(0, 10).map((cat, idx) => (
+                                            <span key={idx} className="badge badge-outline badge-lg">
+                                                {cat}
+                                            </span>
+                                        ))}
+                                        {modelInfo.categories.length > 10 && (
+                                            <span className="badge badge-outline badge-lg">
+                                                +{modelInfo.categories.length - 10} lainnya
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
 
-            {/* Tombol Training */}
+            {/* Tombol Training - Selalu tampil tanpa loading */}
             <div className="card bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h2 className="card-title text-2xl mb-4">Latih Ulang Model</h2>
@@ -158,7 +188,7 @@ const TrainModel = () => {
                         </div>
                     )}
 
-                    {/* Indikator Training dengan Spinner (tanpa progress bar persentase) */}
+                    {/* Indikator Training dengan Spinner */}
                     {training && (
                         <div className="mb-6 text-center">
                             <div className="flex flex-col items-center gap-3">
@@ -181,13 +211,13 @@ const TrainModel = () => {
                 </div>
             </div>
 
-            {/* Panduan */}
+            {/* Panduan - Selalu tampil tanpa loading */}
             <div className="card bg-base-100 shadow-xl">
                 <div className="card-body">
                     <h2 className="card-title text-xl">Panduan</h2>
                     <ul className="list-disc list-inside space-y-2 text-gray-600">
                         <li>Data latih diambil dari database (tabel <code className="px-1 bg-base-200 rounded">dataset</code>).</li>
-                        <li>Training akan memproses semua data dan menyimpan model ke <code className="px-1 bg-base-200 rounded">model_qa.pkl</code>.</li>
+                        <li>Training akan memproses semua data dan menyimpan model ke Supabase Storage.</li>
                         <li>Setelah training selesai, chatbot akan langsung menggunakan model terbaru.</li>
                         <li>Waktu training tergantung jumlah data (biasanya 5-30 detik).</li>
                         <li>Jika training memakan waktu lama, harap bersabar dan jangan refresh halaman.</li>

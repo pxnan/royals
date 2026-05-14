@@ -3,9 +3,81 @@ import SidebarAdmin from '../../components/SidebarAdmin';
 import NavbarAdmin from '../../components/NavbarAdmin';
 import { getAdmins, createAdmin, updateAdmin, resetAdminPassword, deleteAdmin } from '../../api';
 
+// Skeleton Components
+const FilterSkeleton = () => (
+    <div className="card bg-base-100 shadow-xl mb-6">
+        <div className="card-body">
+            <div className="flex justify-between items-center flex-wrap gap-4">
+                <div className="skeleton h-7 w-24"></div>
+                <div className="skeleton h-8 w-36"></div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="form-control">
+                    <div className="skeleton h-4 w-20 mb-1"></div>
+                    <div className="skeleton h-10 w-full"></div>
+                </div>
+                <div className="form-control flex flex-row items-end gap-2">
+                    <div className="skeleton h-10 w-20"></div>
+                    <div className="skeleton h-10 w-20"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+);
+
+const TableSkeleton = ({ rows = 10, columns = 8 }) => (
+    <div className="overflow-x-auto">
+        <table className="table w-full">
+            <thead>
+                <tr className="bg-base-200">
+                    {[...Array(columns)].map((_, i) => (
+                        <th key={i}><div className="skeleton h-4 w-16"></div></th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {[...Array(rows)].map((_, i) => (
+                    <tr key={i}>
+                        {[...Array(columns)].map((_, j) => (
+                            <td key={j}>
+                                <div className="skeleton h-4 w-full"></div>
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
+);
+
+const PaginationSkeleton = () => (
+    <div className="flex justify-center items-center gap-4 mt-6">
+        <div className="skeleton h-8 w-24"></div>
+        <div className="flex gap-1">
+            <div className="skeleton h-8 w-8"></div>
+            <div className="skeleton h-8 w-8"></div>
+            <div className="skeleton h-8 w-8"></div>
+            <div className="skeleton h-8 w-8"></div>
+            <div className="skeleton h-8 w-8"></div>
+        </div>
+        <div className="skeleton h-8 w-24"></div>
+    </div>
+);
+
+const AccessDeniedSkeleton = () => (
+    <div className="card bg-base-100 shadow-xl">
+        <div className="card-body text-center py-20">
+            <div className="skeleton h-16 w-16 rounded-full mx-auto mb-4"></div>
+            <div className="skeleton h-8 w-48 mx-auto mb-2"></div>
+            <div className="skeleton h-4 w-96 mx-auto"></div>
+            <div className="skeleton h-4 w-80 mx-auto mt-2"></div>
+        </div>
+    </div>
+);
+
 const KelolaAdmin = () => {
     const [admins, setAdmins] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -40,6 +112,7 @@ const KelolaAdmin = () => {
     useEffect(() => {
         if (!isSuperAdmin) {
             setError('Anda tidak memiliki izin untuk mengakses halaman ini. Hanya Super Admin yang dapat mengelola admin.');
+            setDataLoading(false);
         }
     }, [isSuperAdmin]);
 
@@ -47,7 +120,7 @@ const KelolaAdmin = () => {
     const fetchAdmins = async (page = 1, searchTerm = '') => {
         if (!isSuperAdmin) return;
         
-        setLoading(true);
+        setDataLoading(true);
         setError('');
         
         try {
@@ -62,7 +135,7 @@ const KelolaAdmin = () => {
             setError(err.message || 'Gagal mengambil data admin');
             console.error('Error:', err);
         } finally {
-            setLoading(false);
+            setDataLoading(false);
         }
     };
 
@@ -255,7 +328,7 @@ const KelolaAdmin = () => {
         return <span className="badge h-auto badge-error">Tidak Aktif</span>;
     };
 
-    // Jika bukan super admin, tampilkan pesan akses ditolak
+    // Jika bukan super admin, tampilkan akses ditolak
     if (!isSuperAdmin) {
         return (
             <>
@@ -266,17 +339,7 @@ const KelolaAdmin = () => {
                         <div className="min-h-screen bg-base-200">
                             <div className="drawer-content flex flex-col md:pr-60 md:pl-60">
                                 <div className="p-4 md:p-6">
-                                    <div className="card bg-base-100 shadow-xl">
-                                        <div className="card-body text-center py-20">
-                                            <div className="text-warning text-6xl mb-4">⚠️</div>
-                                            <h2 className="text-2xl font-bold mb-2">Akses Ditolak</h2>
-                                            <p className="text-gray-600">
-                                                Halaman ini hanya dapat diakses oleh Super Admin.
-                                                <br />
-                                                Anda tidak memiliki izin untuk mengelola admin.
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <AccessDeniedSkeleton />
                                 </div>
                             </div>
                         </div>
@@ -293,7 +356,6 @@ const KelolaAdmin = () => {
                 <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content">
                     <NavbarAdmin title="Kelola Admin" />
-                    
                     <div className="min-h-screen bg-base-200">
                         <div className="drawer-content flex flex-col md:pr-60 md:pl-60">
                             <div className="p-4 md:p-6">
@@ -328,7 +390,7 @@ const KelolaAdmin = () => {
                                     </div>
                                 )}
 
-                                {/* Filter Section */}
+                                {/* Filter Section - Selalu tampil tanpa loading */}
                                 <div className="card bg-base-100 shadow-xl mb-6">
                                     <div className="card-body">
                                         <div className="flex justify-between items-center flex-wrap gap-4">
@@ -369,122 +431,126 @@ const KelolaAdmin = () => {
                                     </div>
                                 </div>
 
-                                {/* Data Table */}
+                                {/* Data Table - Loading terpisah */}
                                 <div className="card bg-base-100 shadow-xl">
                                     <div className="card-body">
                                         <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                                             <h2 className="card-title text-xl">
                                                 Daftar Administrator
-                                                <div className="badge badge-info ml-2">{totalData} Admin</div>
+                                                {!dataLoading && <div className="badge badge-info ml-2">{totalData} Admin</div>}
+                                                {dataLoading && <div className="skeleton h-5 w-16"></div>}
                                             </h2>
                                         </div>
 
-                                        {loading ? (
-                                            <div className="flex justify-center items-center py-20">
-                                                <span className="loading loading-spinner loading-lg"></span>
-                                            </div>
+                                        {dataLoading ? (
+                                            <>
+                                                <TableSkeleton rows={10} columns={8} />
+                                                <PaginationSkeleton />
+                                            </>
                                         ) : admins.length === 0 ? (
                                             <p className="text-gray-500 text-center py-8">Tidak ada data admin</p>
                                         ) : (
-                                            <div className="overflow-x-auto">
-                                                <table className="table table-zebra w-full">
-                                                    <thead>
-                                                        <tr className="bg-base-200">
-                                                            <th>No</th>
-                                                            <th>Username</th>
-                                                            <th>Nama Lengkap</th>
-                                                            <th>Email</th>
-                                                            <th>Role</th>
-                                                            <th>Status</th>
-                                                            <th>Last Login</th>
-                                                            <th className="text-center">Aksi</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {admins.map((admin, idx) => (
-                                                            <tr key={admin.id}>
-                                                                <td>{((currentPage - 1) * 10) + idx + 1}</td>
-                                                                <td className="font-medium">{admin.username}</td>
-                                                                <td>{admin.full_name}</td>
-                                                                <td>{admin.email}</td>
-                                                                <td>{getRoleBadge(admin.role)}</td>
-                                                                <td>{getStatusBadge(admin.is_active)}</td>
-                                                                <td className="text-sm">{formatDate(admin.last_login)}</td>
-                                                                <td className="text-center">
-                                                                    <div className="flex gap-1 justify-center">
-                                                                        <button
-                                                                            className="btn btn-xs btn-info"
-                                                                            onClick={() => handleOpenEditModal(admin)}
-                                                                            title="Edit"
-                                                                        >
-                                                                            ✏️
-                                                                        </button>
-                                                                        <button
-                                                                            className="btn btn-xs btn-warning"
-                                                                            onClick={() => handleOpenResetPasswordModal(admin)}
-                                                                            title="Reset Password"
-                                                                        >
-                                                                            🔑
-                                                                        </button>
-                                                                        {currentAdmin.username !== admin.username && (
-                                                                            <button
-                                                                                className="btn btn-xs btn-error"
-                                                                                onClick={() => handleDeleteClick(admin.id)}
-                                                                                title="Hapus"
-                                                                            >
-                                                                                🗑️
-                                                                            </button>
-                                                                        )}
-                                                                    </div>
-                                                                </td>
+                                            <>
+                                                <div className="overflow-x-auto">
+                                                    <table className="table table-zebra w-full">
+                                                        <thead>
+                                                            <tr className="bg-base-200">
+                                                                <th>No</th>
+                                                                <th>Username</th>
+                                                                <th>Nama Lengkap</th>
+                                                                <th>Email</th>
+                                                                <th>Role</th>
+                                                                <th>Status</th>
+                                                                <th>Last Login</th>
+                                                                <th className="text-center">Aksi</th>
                                                             </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-
-                                        {/* Pagination */}
-                                        {totalPages > 1 && (
-                                            <div className="flex justify-center items-center gap-4 mt-6">
-                                                <button
-                                                    className="btn btn-sm"
-                                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                                    disabled={currentPage === 1}
-                                                >
-                                                    « Sebelumnya
-                                                </button>
-                                                <div className="flex gap-1">
-                                                    {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                                                        let pageNum;
-                                                        if (totalPages <= 5) {
-                                                            pageNum = i + 1;
-                                                        } else if (currentPage <= 3) {
-                                                            pageNum = i + 1;
-                                                        } else if (currentPage >= totalPages - 2) {
-                                                            pageNum = totalPages - 4 + i;
-                                                        } else {
-                                                            pageNum = currentPage - 2 + i;
-                                                        }
-                                                        return (
-                                                            <button
-                                                                key={pageNum}
-                                                                className={`btn btn-sm ${currentPage === pageNum ? 'btn-primary' : 'btn-ghost'}`}
-                                                                onClick={() => setCurrentPage(pageNum)}
-                                                            >
-                                                                {pageNum}
-                                                            </button>
-                                                        );
-                                                    })}
+                                                        </thead>
+                                                        <tbody>
+                                                            {admins.map((admin, idx) => (
+                                                                <tr key={admin.id}>
+                                                                    <td>{((currentPage - 1) * 10) + idx + 1}</td>
+                                                                    <td className="font-medium">{admin.username}</td>
+                                                                    <td>{admin.full_name}</td>
+                                                                    <td>{admin.email}</td>
+                                                                    <td>{getRoleBadge(admin.role)}</td>
+                                                                    <td>{getStatusBadge(admin.is_active)}</td>
+                                                                    <td className="text-sm">{formatDate(admin.last_login)}</td>
+                                                                    <td className="text-center">
+                                                                        <div className="flex gap-1 justify-center">
+                                                                            <button
+                                                                                className="btn btn-xs btn-info"
+                                                                                onClick={() => handleOpenEditModal(admin)}
+                                                                                title="Edit"
+                                                                            >
+                                                                                ✏️
+                                                                            </button>
+                                                                            <button
+                                                                                className="btn btn-xs btn-warning"
+                                                                                onClick={() => handleOpenResetPasswordModal(admin)}
+                                                                                title="Reset Password"
+                                                                            >
+                                                                                🔑
+                                                                            </button>
+                                                                            {currentAdmin.username !== admin.username && (
+                                                                                <button
+                                                                                    className="btn btn-xs btn-error"
+                                                                                    onClick={() => handleDeleteClick(admin.id)}
+                                                                                    title="Hapus"
+                                                                                >
+                                                                                    🗑️
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                                <button
-                                                    className="btn btn-sm"
-                                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                                    disabled={currentPage === totalPages}
-                                                >
-                                                    Selanjutnya »
-                                                </button>
-                                            </div>
+
+                                                {/* Pagination */}
+                                                {totalPages > 1 && (
+                                                    <div className="flex justify-center items-center gap-4 mt-6">
+                                                        <button
+                                                            className="btn btn-sm"
+                                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                                            disabled={currentPage === 1}
+                                                        >
+                                                            « Sebelumnya
+                                                        </button>
+                                                        <div className="flex gap-1">
+                                                            {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                                                                let pageNum;
+                                                                if (totalPages <= 5) {
+                                                                    pageNum = i + 1;
+                                                                } else if (currentPage <= 3) {
+                                                                    pageNum = i + 1;
+                                                                } else if (currentPage >= totalPages - 2) {
+                                                                    pageNum = totalPages - 4 + i;
+                                                                } else {
+                                                                    pageNum = currentPage - 2 + i;
+                                                                }
+                                                                return (
+                                                                    <button
+                                                                        key={pageNum}
+                                                                        className={`btn btn-sm ${currentPage === pageNum ? 'btn-primary' : 'btn-ghost'}`}
+                                                                        onClick={() => setCurrentPage(pageNum)}
+                                                                    >
+                                                                        {pageNum}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                        <button
+                                                            className="btn btn-sm"
+                                                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                                            disabled={currentPage === totalPages}
+                                                        >
+                                                            Selanjutnya »
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </>
                                         )}
                                     </div>
                                 </div>

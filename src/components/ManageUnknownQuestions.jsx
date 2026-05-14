@@ -1,25 +1,88 @@
 import React, { useState, useEffect } from 'react';
 import { getUnknownQuestions, deleteUnknownQuestion, deleteAllUnknownQuestions } from '../api';
 
+// Skeleton Components
+const HeaderSkeleton = () => (
+  <div className="card bg-base-100 shadow-xl mb-6">
+    <div className="card-body">
+      <div className="flex justify-between items-center flex-wrap gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="skeleton h-7 w-48"></div>
+            <div className="skeleton h-5 w-16"></div>
+          </div>
+          <div className="skeleton h-4 w-64 mt-2"></div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <div className="skeleton h-8 w-36"></div>
+          <div className="skeleton h-8 w-28"></div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <div className="skeleton h-8 w-36"></div>
+          <div className="skeleton h-8 w-28"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const TableSkeleton = ({ rows = 10, columns = 5 }) => (
+  <div className="overflow-x-auto">
+    <table className="table w-full">
+      <thead>
+        <tr className="bg-base-200">
+          {[...Array(columns)].map((_, i) => (
+            <th key={i}><div className="skeleton h-4 w-12"></div></th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {[...Array(rows)].map((_, i) => (
+          <tr key={i}>
+            {[...Array(columns)].map((_, j) => (
+              <td key={j}>
+                <div className="skeleton h-4 w-full"></div>
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const PaginationSkeleton = () => (
+  <div className="flex justify-center items-center gap-4 mt-6">
+    <div className="skeleton h-8 w-24"></div>
+    <div className="flex gap-1">
+      <div className="skeleton h-8 w-8"></div>
+      <div className="skeleton h-8 w-8"></div>
+      <div className="skeleton h-8 w-8"></div>
+      <div className="skeleton h-8 w-8"></div>
+      <div className="skeleton h-8 w-8"></div>
+    </div>
+    <div className="skeleton h-8 w-24"></div>
+  </div>
+);
+
 const ManageUnknownQuestions = ({ onDataChange }) => {
     const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [dataLoading, setDataLoading] = useState(true);
     const [error, setError] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalData, setTotalData] = useState(0);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteId, setDeleteId] = useState(null);
-    const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectAll, setSelectAll] = useState(false);
 
     const fetchData = async (page = 1) => {
-        setLoading(true);
+        setDataLoading(true);
         setError('');
         try {
-            const result = await getUnknownQuestions(page, 10); // UBahkan ke 10 data per halaman
+            const result = await getUnknownQuestions(page, 10);
             setData(result.data);
             setCurrentPage(result.page);
             setTotalPages(result.total_pages);
@@ -28,7 +91,7 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
             setError(err.message || 'Gagal mengambil data');
             console.error('Error:', err);
         } finally {
-            setLoading(false);
+            setDataLoading(false);
         }
     };
 
@@ -104,11 +167,11 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
     };
 
     const navigateToAddTab = () => {
-        window.location.href = '/admin/input-pertanyaan?tab=add';
+        window.location.href = '/admin/kelola-data?tab=add';
     };
 
     const navigateToDatasetTab = () => {
-        window.location.href = '/admin/input-pertanyaan?tab=dataset';
+        window.location.href = '/admin/kelola-data?tab=dataset';
     };
 
     const formatDate = (dateString) => {
@@ -128,18 +191,9 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
         }
     };
 
-    // Fungsi untuk mendapatkan nomor urut (PERHITUNGAN DIPERBAIKI)
     const getRowNumber = (index) => {
-        return ((currentPage - 1) * 10) + index + 1; // MENGGUNAKAN 10, BUKAN 20
+        return ((currentPage - 1) * 10) + index + 1;
     };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center py-20">
-                <span className="loading loading-spinner loading-lg"></span>
-            </div>
-        );
-    }
 
     return (
         <div>
@@ -167,14 +221,15 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                 </div>
             )}
 
-            {/* Header Actions */}
+            {/* Header Actions - Selalu tampil tanpa loading */}
             <div className="card bg-base-100 shadow-xl mb-6">
                 <div className="card-body">
                     <div className="flex justify-between items-center flex-wrap gap-4">
                         <div>
                             <h2 className="card-title text-xl">
                                 Pertanyaan Tidak Dikenali
-                                <div className="badge badge-warning ml-2 h-auto">{totalData} Pertanyaan</div>
+                                {!dataLoading && <div className="badge badge-warning ml-2 h-auto">{totalData} Pertanyaan</div>}
+                                {dataLoading && <div className="skeleton h-5 w-16 ml-2"></div>}
                             </h2>
                             <p className="text-sm text-gray-500 mt-1">
                                 Daftar pertanyaan yang tidak dapat dijawab oleh chatbot
@@ -195,7 +250,7 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                             >
                                 📋 Kelola Dataset
                             </button>
-                            {selectedItems.length > 0 && (
+                            {!dataLoading && selectedItems.length > 0 && (
                                 <button
                                     className="btn btn-error btn-sm"
                                     onClick={handleDeleteSelected}
@@ -204,24 +259,23 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                     🗑️ Hapus Terpilih ({selectedItems.length})
                                 </button>
                             )}
-                            {totalData > 0 && (
-                                <button
-                                    className="btn btn-outline btn-warning btn-sm"
-                                    onClick={() => setShowDeleteAllModal(true)}
-                                    title="Hapus Semua"
-                                >
-                                    🗑️ Hapus Semua
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Data Table */}
+            {/* Data Table - Loading terpisah */}
             <div className="card bg-base-100 shadow-xl">
                 <div className="card-body">
-                    {data.length === 0 ? (
+                    {dataLoading ? (
+                        <>
+                            <TableSkeleton rows={10} columns={5} />
+                            <PaginationSkeleton />
+                            <div className="flex justify-center mt-4">
+                                <div className="skeleton h-3 w-48"></div>
+                            </div>
+                        </>
+                    ) : data.length === 0 ? (
                         <div className="alert alert-info shadow-lg">
                             <div>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6">
@@ -371,7 +425,7 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                 </div>
                             )}
 
-                            {/* Info - PERBAIKI PERHITUNGAN */}
+                            {/* Info */}
                             <div className="text-center text-xs text-gray-500 mt-4">
                                 Menampilkan {((currentPage - 1) * 10) + 1} - {Math.min(currentPage * 10, totalData)} dari {totalData} pertanyaan
                             </div>
@@ -391,29 +445,6 @@ const ManageUnknownQuestions = ({ onDataChange }) => {
                                 Hapus
                             </button>
                             <button className="btn" onClick={() => setShowDeleteModal(false)}>
-                                Batal
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete All Confirmation Modal */}
-            {showDeleteAllModal && (
-                <div className="modal modal-open">
-                    <div className="modal-box">
-                        <h3 className="font-bold text-lg text-warning">⚠️ Konfirmasi Hapus Semua</h3>
-                        <p className="py-4">
-                            Apakah Anda yakin ingin menghapus <span className="font-bold text-warning">SEMUA</span> pertanyaan tidak dikenal?
-                            <br />
-                            <br />
-                            <span className="text-error font-bold">Tindakan ini tidak dapat dibatalkan!</span>
-                        </p>
-                        <div className="modal-action">
-                            <button className="btn btn-error" onClick={handleDeleteAll}>
-                                Ya, Hapus Semua
-                            </button>
-                            <button className="btn" onClick={() => setShowDeleteAllModal(false)}>
                                 Batal
                             </button>
                         </div>
