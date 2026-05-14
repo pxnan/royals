@@ -2,8 +2,8 @@
 
 // ==================== KONFIGURASI API UNTUK VITE ====================
 // Menggunakan import.meta.env dengan fallback untuk menghindari undefined
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
-const API_KEY = import.meta.env.VITE_API_KEY || "RoyalsResto2024SecureKey!@";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Helper untuk logging hanya di development
 const devLog = (...args) => {
