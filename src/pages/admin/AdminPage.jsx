@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SidebarAdmin from "../../components/SidebarAdmin";
 import NavbarAdmin from "../../components/NavbarAdmin";
-import { getStats, getUnknownQuestions, getKategori, cekCSV, getModelInfo } from "../../api";
+import { getStats, getUnknownQuestions, getKategori, getAllData, getModelInfo } from "../../api";
 
 // Skeleton Components
 const StatCardSkeleton = () => (
@@ -172,21 +172,22 @@ const AdminPage = () => {
             setCategoriesLoading(false);
         }
 
-        // ========== LOAD RECENT DATA (CSV) ==========
+        // ========== LOAD RECENT DATA dari DATABASE (5 data terbaru) ==========
         setRecentDataLoading(true);
         try {
-            const csvData = await cekCSV();
-            if (csvData && csvData.last_5_rows) {
-                const rows = csvData.last_5_rows || [];
-                const recentRows = rows.slice(1).map(row => ({
-                    pertanyaan: row[0] || '',
-                    jawaban: row[1] ? (row[1].substring(0, 50) + (row[1].length > 50 ? '...' : '')) : '',
-                    kategori: row[2] || ''
+            // Ambil data dari database, page 1, per_page 5, tanpa filter
+            const result = await getAllData(1, 5, "", "");
+            if (result && result.data) {
+                const recentRows = result.data.map(item => ({
+                    pertanyaan: item.pertanyaan || '',
+                    jawaban: item.jawaban ? (item.jawaban.substring(0, 50) + (item.jawaban.length > 50 ? '...' : '')) : '',
+                    kategori: item.kategori || ''
                 }));
                 setRecentData(recentRows);
             }
         } catch (err) {
             console.error('Recent data error:', err);
+            setRecentData([]);
         } finally {
             setRecentDataLoading(false);
         }
@@ -414,7 +415,7 @@ const AdminPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Recent Data - Loading terpisah dengan 6 baris + tombol skeleton */}
+                                {/* Recent Data - Dari Database */}
                                 <div className="card bg-base-100 shadow-xl mb-4 md:mb-8">
                                     <div className="card-body p-3 sm:p-4 md:p-6">
                                         <div className="flex items-center justify-between mb-2 md:mb-4">
@@ -440,7 +441,7 @@ const AdminPage = () => {
                                                                 <th className="min-w-[100px]">Pertanyaan</th>
                                                                 <th className="min-w-[120px]">Jawaban</th>
                                                                 <th className="w-20 sm:w-24">Kategori</th>
-                                                            </tr>
+                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {recentData.map((item, idx) => (
@@ -448,10 +449,10 @@ const AdminPage = () => {
                                                                     <td className="break-words text-xs sm:text-sm">{item.pertanyaan}</td>
                                                                     <td className="break-words text-xs sm:text-sm">{item.jawaban}</td>
                                                                     <td><span className="badge badge-outline badge-xs sm:badge-sm">{item.kategori || '-'}</span></td>
-                                                                </tr>
+                                                                 </tr>
                                                             ))}
                                                         </tbody>
-                                                    </table>
+                                                     </table>
                                                 </div>
                                                 <div className="card-actions justify-end mt-2 sm:mt-4">
                                                     <a href="/admin/kelola-data?tab=add" className="btn btn-xs sm:btn-sm btn-primary">
