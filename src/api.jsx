@@ -346,23 +346,23 @@ export async function deleteData(id) {
     return await response.json();
 }
 
-// ==================== ENDPOINT UNKNOWN QUESTIONS TERBARU ====================
-export async function getUnknownRecent() {
-    const response = await fetch(`/api/unknown-recent`, {
+// ==================== ENDPOINT UNTUK 5 DATA TERBARU ====================
+
+export async function getRecentUnknownQuestions() {
+    const response = await fetch(`${API_BASE_URL}/api/unknown/recent`, {
         method: "GET",
         headers: getHeaders(),
     });
 
     if (!response.ok) {
-        throw new Error("Gagal mengambil data unknown terbaru");
+        throw new Error("Gagal mengambil data pertanyaan unknown terbaru");
     }
 
     return await response.json();
 }
 
-// ==================== ENDPOINT DATASET TERBARU ====================
-export async function getDatasetRecent() {
-    const response = await fetch(`/api/dataset-recent`, {
+export async function getRecentDataset() {
+    const response = await fetch(`${API_BASE_URL}/api/dataset/recent`, {
         method: "GET",
         headers: getHeaders(),
     });
@@ -516,11 +516,11 @@ export default {
     resetAdminPassword,
     deleteAdmin,
     getUnknownQuestions,
-    getUnknownRecent,
+    getRecentUnknownQuestions,
+    getRecentDataset,
     deleteUnknownQuestion,
     deleteAllUnknownQuestions,
     getAllData,
-    getDatasetRecent,
     tambahData,
     updateData,
     deleteData,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import SidebarAdmin from "../../components/SidebarAdmin";
 import NavbarAdmin from "../../components/NavbarAdmin";
-import { getStats, getUnknownRecent, getKategori, getDatasetRecent, getModelInfo } from "../../api";
+import { getStats, getKategori, getModelInfo, getRecentUnknownQuestions, getRecentDataset } from "../../api";
 
 // Skeleton Components (sama seperti sebelumnya)
 const StatCardSkeleton = () => (
@@ -39,7 +39,6 @@ const TableSkeleton = ({ rows = 3, columns = 3 }) => (
     </div>
 );
 
-// Skeleton untuk tabel dengan 6 baris + tombol di baris ke-7
 const TableWithButtonSkeleton = ({ columns = 3 }) => (
     <>
         <div className="overflow-x-auto">
@@ -52,7 +51,7 @@ const TableWithButtonSkeleton = ({ columns = 3 }) => (
                     </tr>
                 </thead>
                 <tbody>
-                    {[...Array(6)].map((_, i) => (
+                    {[...Array(5)].map((_, i) => (
                         <tr key={i}>
                             {[...Array(columns)].map((_, j) => (
                                 <td key={j}><div className="skeleton h-4 w-full"></div></td>
@@ -98,9 +97,6 @@ const AdminPage = () => {
     const [recentData, setRecentData] = useState([]);
     const [recentDataLoading, setRecentDataLoading] = useState(true);
 
-    const [categories, setCategories] = useState([]);
-    const [categoriesLoading, setCategoriesLoading] = useState(true);
-
     const [error, setError] = useState('');
     const [checkingModel, setCheckingModel] = useState(false);
 
@@ -144,42 +140,28 @@ const AdminPage = () => {
             setStatsLoading(false);
         }
 
-        // ========== LOAD UNKNOWN QUESTIONS (5 terbaru) ==========
+        // ========== LOAD RECENT UNKNOWN QUESTIONS (5 terbaru) ==========
         setUnknownLoading(true);
         try {
-            const unknownData = await getUnknownRecent();
-            if (unknownData && unknownData.data) {
-                setRecentUnknown(unknownData.data.slice(0, 5));
+            const result = await getRecentUnknownQuestions();
+            if (result && result.data) {
+                setRecentUnknown(result.data);
             }
         } catch (err) {
-            console.error('Unknown questions error:', err);
+            console.error('Recent unknown questions error:', err);
         } finally {
             setUnknownLoading(false);
         }
 
-        // ========== LOAD KATEGORI ==========
-        setCategoriesLoading(true);
-        try {
-            const kategoriData = await getKategori();
-            if (kategoriData && kategoriData.kategori) {
-                setCategories(kategoriData.kategori);
-            }
-        } catch (err) {
-            console.error('Categories error:', err);
-        } finally {
-            setCategoriesLoading(false);
-        }
-
-        // ========== LOAD DATASET TERBARU (5 data terbaru) ==========
+        // ========== LOAD RECENT DATASET (5 terbaru) ==========
         setRecentDataLoading(true);
         try {
-            const recentDataResult = await getDatasetRecent();
-            if (recentDataResult && recentDataResult.data) {
-                setRecentData(recentDataResult.data);
+            const result = await getRecentDataset();
+            if (result && result.data) {
+                setRecentData(result.data);
             }
         } catch (err) {
-            console.error('Recent data error:', err);
-            setRecentData([]);
+            console.error('Recent dataset error:', err);
         } finally {
             setRecentDataLoading(false);
         }
@@ -352,7 +334,7 @@ const AdminPage = () => {
                                     )}
                                 </div>
 
-                                {/* Recent Unknown */}
+                                {/* Recent Unknown - 5 data terbaru */}
                                 <div className="card bg-base-100 shadow-xl mb-4 md:mb-8">
                                     <div className="card-body p-3 sm:p-4 md:p-6">
                                         <div className="flex items-center justify-between mb-2 md:mb-4">
@@ -407,7 +389,7 @@ const AdminPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Recent Data */}
+                                {/* Recent Data - 5 data terbaru dari database */}
                                 <div className="card bg-base-100 shadow-xl mb-4 md:mb-8">
                                     <div className="card-body p-3 sm:p-4 md:p-6">
                                         <div className="flex items-center justify-between mb-2 md:mb-4">
