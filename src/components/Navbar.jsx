@@ -26,8 +26,11 @@ const Navbar = ({ onClearHistory, hasMessages }) => {
         <>
             <div className="navbar bg-white shadow-lg sticky top-0 z-50 border-b border-gray-300">
                 <div className="flex w-full justify-between px-5 items-center">
-                    <Link to={"/"} className="text-xl font-semibold">
+                    <Link to={"/"} className="flex items-center gap-1">
+                    <img src="/logo.png" alt="Logo" className="h-8 w-8 mr-2" />
+                    <div className="text-xl font-semibold">
                         Royal's Resto <span className='bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-600 bg-clip-text text-transparent font-bold'>Bot</span>
+                    </div>
                     </Link>
                     
                     {hasMessages && (
