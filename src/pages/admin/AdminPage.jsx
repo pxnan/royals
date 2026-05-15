@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import SidebarAdmin from "../../components/SidebarAdmin";
 import NavbarAdmin from "../../components/NavbarAdmin";
-import { getStats, getUnknownQuestions, getKategori, getAllData, getModelInfo } from "../../api";
+import { getStats, getUnknownRecent, getKategori, getDatasetRecent, getModelInfo } from "../../api";
 
-// Skeleton Components
+// Skeleton Components (sama seperti sebelumnya)
 const StatCardSkeleton = () => (
     <div className="bg-base-100 rounded-xl shadow-md p-3 border border-base-200">
         <div className="flex items-start justify-between">
@@ -52,7 +52,6 @@ const TableWithButtonSkeleton = ({ columns = 3 }) => (
                     </tr>
                 </thead>
                 <tbody>
-                    {/* 6 baris skeleton */}
                     {[...Array(6)].map((_, i) => (
                         <tr key={i}>
                             {[...Array(columns)].map((_, j) => (
@@ -63,7 +62,6 @@ const TableWithButtonSkeleton = ({ columns = 3 }) => (
                 </tbody>
             </table>
         </div>
-        {/* Baris ke-7: skeleton tombol di sebelah kanan */}
         <div className="flex justify-end mt-2 sm:mt-4">
             <div className="skeleton h-8 w-28"></div>
         </div>
@@ -146,10 +144,10 @@ const AdminPage = () => {
             setStatsLoading(false);
         }
 
-        // ========== LOAD UNKNOWN QUESTIONS ==========
+        // ========== LOAD UNKNOWN QUESTIONS (5 terbaru) ==========
         setUnknownLoading(true);
         try {
-            const unknownData = await getUnknownQuestions(1, 5);
+            const unknownData = await getUnknownRecent();
             if (unknownData && unknownData.data) {
                 setRecentUnknown(unknownData.data.slice(0, 5));
             }
@@ -172,18 +170,12 @@ const AdminPage = () => {
             setCategoriesLoading(false);
         }
 
-        // ========== LOAD RECENT DATA dari DATABASE (5 data terbaru) ==========
+        // ========== LOAD DATASET TERBARU (5 data terbaru) ==========
         setRecentDataLoading(true);
         try {
-            // Ambil data dari database, page 1, per_page 5, tanpa filter
-            const result = await getAllData(1, 5, "", "");
-            if (result && result.data) {
-                const recentRows = result.data.map(item => ({
-                    pertanyaan: item.pertanyaan || '',
-                    jawaban: item.jawaban ? (item.jawaban.substring(0, 50) + (item.jawaban.length > 50 ? '...' : '')) : '',
-                    kategori: item.kategori || ''
-                }));
-                setRecentData(recentRows);
+            const recentDataResult = await getDatasetRecent();
+            if (recentDataResult && recentDataResult.data) {
+                setRecentData(recentDataResult.data);
             }
         } catch (err) {
             console.error('Recent data error:', err);
@@ -237,7 +229,7 @@ const AdminPage = () => {
                     <div className="min-h-screen bg-base-200">
                         <div className="drawer-content flex flex-col md:pr-60 md:pl-60">
                             <div className="p-3 sm:p-4 md:p-6">
-                                {/* Header - Selalu tampil tanpa skeleton */}
+                                {/* Header */}
                                 <div className="mb-4 md:mb-8">
                                     <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-1 md:mb-2">
                                         Dashboard Admin
@@ -258,7 +250,7 @@ const AdminPage = () => {
                                     </div>
                                 )}
 
-                                {/* Stat Cards - Loading per card */}
+                                {/* Stat Cards */}
                                 <div className="grid grid-cols-2 gap-6 mb-6">
                                     {/* Total Pertanyaan */}
                                     {statsLoading ? (
@@ -415,7 +407,7 @@ const AdminPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Recent Data - Dari Database */}
+                                {/* Recent Data */}
                                 <div className="card bg-base-100 shadow-xl mb-4 md:mb-8">
                                     <div className="card-body p-3 sm:p-4 md:p-6">
                                         <div className="flex items-center justify-between mb-2 md:mb-4">
@@ -441,7 +433,7 @@ const AdminPage = () => {
                                                                 <th className="min-w-[100px]">Pertanyaan</th>
                                                                 <th className="min-w-[120px]">Jawaban</th>
                                                                 <th className="w-20 sm:w-24">Kategori</th>
-                                                             </tr>
+                                                            </tr>
                                                         </thead>
                                                         <tbody>
                                                             {recentData.map((item, idx) => (
@@ -449,10 +441,10 @@ const AdminPage = () => {
                                                                     <td className="break-words text-xs sm:text-sm">{item.pertanyaan}</td>
                                                                     <td className="break-words text-xs sm:text-sm">{item.jawaban}</td>
                                                                     <td><span className="badge badge-outline badge-xs sm:badge-sm">{item.kategori || '-'}</span></td>
-                                                                 </tr>
+                                                                </tr>
                                                             ))}
                                                         </tbody>
-                                                     </table>
+                                                    </table>
                                                 </div>
                                                 <div className="card-actions justify-end mt-2 sm:mt-4">
                                                     <a href="/admin/kelola-data?tab=add" className="btn btn-xs sm:btn-sm btn-primary">
@@ -464,7 +456,7 @@ const AdminPage = () => {
                                     </div>
                                 </div>
 
-                                {/* Quick Actions - Selalu tampil tanpa loading */}
+                                {/* Quick Actions */}
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 mt-4 md:mt-8">
                                     <div className="card bg-primary text-primary-content shadow-xl">
                                         <div className="card-body p-3 sm:p-4 md:p-6">

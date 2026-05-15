@@ -346,6 +346,34 @@ export async function deleteData(id) {
     return await response.json();
 }
 
+// ==================== ENDPOINT UNKNOWN QUESTIONS TERBARU ====================
+export async function getUnknownRecent() {
+    const response = await fetch(`/api/unknown-recent`, {
+        method: "GET",
+        headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+        throw new Error("Gagal mengambil data unknown terbaru");
+    }
+
+    return await response.json();
+}
+
+// ==================== ENDPOINT DATASET TERBARU ====================
+export async function getDatasetRecent() {
+    const response = await fetch(`/api/dataset-recent`, {
+        method: "GET",
+        headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+        throw new Error("Gagal mengambil data dataset terbaru");
+    }
+
+    return await response.json();
+}
+
 // ==================== ENDPOINT BULK DELETE ====================
 export async function deleteBulkData(indices) {
     const response = await fetch(`${API_BASE_URL}/api/delete-bulk-data`, {
@@ -488,9 +516,11 @@ export default {
     resetAdminPassword,
     deleteAdmin,
     getUnknownQuestions,
+    getUnknownRecent,
     deleteUnknownQuestion,
     deleteAllUnknownQuestions,
     getAllData,
+    getDatasetRecent,
     tambahData,
     updateData,
     deleteData,
